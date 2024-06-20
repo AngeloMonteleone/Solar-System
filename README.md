@@ -145,3 +145,4 @@ string = "Day={:.3f}\n".format(instant/86400) +r'$E_{\text{tot}}$' + "={:.5E}\nC
 ```
 ## Some interesting results
 Here an example screenshot is highlighted:
+![Example with the center of mass of the Earth and the Moon](example_picture.png)
