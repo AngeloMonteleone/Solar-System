@@ -132,18 +132,54 @@ The program can also "focus" on different things when different buttons are pres
 + a: center of mass of the Earth and the Moon
 + b: center of mass of Mars and its moons
 
-At last before the return statement a string is constructed in order to report on the animation some data, such as the total energy, total angular momentum, the planet position...
+At last, before the return statement a string is constructed in order to report on the animation some data, such as the total energy, total angular momentum, the planet position...
 
 ```python
 string = "Day={:.3f}\n".format(instant/86400) +r'$E_{\text{tot}}$' + "={:.5E}\nComputation time={:.3f}s, Animation time={:.3f}s".format(
         total_energy(pars,init_data),computation_time,animation_time)
     
     string=center_on_planet(current_body,current_limits,string)
-    # test = r'\nL_{\text{tot}}'
-    string += "\n"+r'$\vec{L_{\text{tot}}}$' + " = {}".format(total_angular_momentum())
-    string += "\n"+r'$\vert \vec{L_{\text{tot}}}\vert$' + " = {:.7E}".format(np.linalg.norm(total_angular_momentum()))
+    string += "\n"+r'$L_{\text{tot}}$' + " = {}".format(total_angular_momentum())
+    string += "\n"+r'$\vert L_{\text{tot}}\vert$' + " = {:.7E}".format(np.linalg.norm(total_angular_momentum()))
+    data.set_text(string)
+    planet_name.set_text(additional_text)
 ```
 ## Some interesting results
 This is an example where the animation switches between all possible bodies:
 
 ![Example with the center of mass of the Earth and the Moon](images/all_planets.gif)
+
+The code also computes when a planet has completed an orbit. This is implemented by looking at the angle of the planet between the initial position vector and the current position vector. The employed function to compute the angle returns a value between 0° and 180°, where the 0° means that the planet is at the beginning of the orbit and 180° that it is at the end. Obviously after the first orbit the planets will not occupy the exact point in space where they started, due to numerical errors which make it so that the orbits are not perfectly closed:
+
+```python
+#function which collects useful information about the orbits, to be later used in other functions
+def study_orbits():
+    for i in allowed_planets:
+        #Save the current displacement for the i_th planet
+        displacements_r[i].append(np.linalg.norm(np.array(initial_positions[i])-np.array(planet_vector(i))))
+        #Save the current angle for the i_th planet
+        delta_theta[i].append(angle(np.array(planet_vector(i))-np.array(planet_vector(0)),initial_positions[i]))
+        #distances from the sun
+        delta_r[i].append(np.array(planet_vector(i))-np.array(planet_vector(0)))
+        if(len(delta_theta[i])==4):
+            #only three subsequent values are stored for the angle
+            delta_theta[i].remove(delta_theta[i][0])
+        if(len(delta_r[i])==3):
+            #only two subsequent values are stored for the angle
+            delta_r[i].remove(delta_r[i][0])
+        if(len(displacements_r[i])==4):
+            #only three subsequent values are stored for the displacement
+            displacements_r[i].remove(displacements_r[i][0])
+        #These two condition seem to work in the same way, that is searching for a minimum of the angle or for a minimum of the displacement
+        # if(len(displacements_r[i])==3 and displacements_r[i][1]<displacements_r[i][2] and displacements_r[i][0]>displacements_r[i][1]):
+        if(len(delta_theta[i])==3 and delta_theta[i][1]<delta_theta[i][2] and delta_theta[i][0]>delta_theta[i][1]):
+            years[i]+=1
+            print("Minimum dispacement: {}".format(displacements_r[i][1]))
+            print(names[i]+"Period #{}: {}".format(years[i],instant/86400))
+```
+
+Notwithstanding this, the code produced results which are coherent with the actual ones. For example in a test run with an integration step of 8640 seconds (1/10 of a day) the results for the orbital periods were the following. All data is reported in days (in parenthesis the real value):
++ Mercury: 88.1 (87.96)
++ Venus: 225.0 (224.7)
++ Earth: 366.2 (365.25)
++ Mars: 687.7 (686.96)
