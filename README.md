@@ -144,5 +144,6 @@ string = "Day={:.3f}\n".format(instant/86400) +r'$E_{\text{tot}}$' + "={:.5E}\nC
     string += "\n"+r'$\vert \vec{L_{\text{tot}}}\vert$' + " = {:.7E}".format(np.linalg.norm(total_angular_momentum()))
 ```
 ## Some interesting results
-Here an example screenshot is highlighted:
-![Example with the center of mass of the Earth and the Moon](example_picture.png)
+This is an example where the animation switches between all possible bodies:
+
+![Example with the center of mass of the Earth and the Moon](images/all_planets.gif)
