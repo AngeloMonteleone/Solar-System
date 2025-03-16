@@ -23,7 +23,7 @@ number_of_bodies = 12
 draw_limit = 365
 repeat_integration = 10
 instant=0
-step=864.00
+step=8640.00
 computation_time=0
 animation_time=0
 
@@ -212,6 +212,55 @@ def onclick(event):
 
 cid = fig.canvas.mpl_connect('key_press_event', onclick)
 
+#This is just a variation of the onclick function, for the purpose of building an animation which switches between the different 
+#planets without an external input
+def switch_planet(key):
+    global current_body,current_limits
+    print(key)
+    if(key==0):#Sun
+        current_body = 0
+        current_limits = [1.33*neptune_dist,1.33*neptune_dist,1.33*neptune_z]
+    elif(key==1):#Mercury
+        current_body = 1
+        current_limits = [1.33*mercury_dist,1.33*mercury_dist,1.33*mercury_z]
+    elif(key==2):#Venus
+        current_body = 2
+        current_limits = [1.33*venus_dist,1.33*venus_dist,1.33*venus_z]
+    elif(key==3):#Earth
+        current_body = 3
+        current_limits = [1.33*earth_dist,1.33*earth_dist,1.33*earth_z]
+    elif(key==4):#Moon
+        current_body = 4
+        current_limits = [1.33*moon_earth_dist,1.33*moon_earth_dist,1.33*earth_z]
+    elif(key==5):#Earth-Moon center of mass
+        current_body=-1
+        current_limits = [1.33*moon_earth_dist,1.33*moon_earth_dist,1.33*earth_z]
+    elif(key==6):#Mars
+        current_body = 5
+        current_limits = [1.33*mars_dist,1.33*mars_dist,1.33*mars_z]
+    elif(key==7):#Phobos
+        current_body = 6
+        current_limits = [1.33*phobos_mars_dist,1.33*phobos_mars_dist,1.33*mars_z]
+    elif(key==8):#Deimos
+        current_body = 7
+        current_limits = [1.33*deimos_mars_dist,1.33*deimos_mars_dist,1.33*mars_z]
+    elif(key==9):#Phobos-Deimos_Mars center of mass
+        current_body = -2
+        current_limits = [1.33*deimos_mars_dist,1.33*deimos_mars_dist,1.33*mars_z]
+    elif(key==10):#Jupiter
+        current_body = 8
+        current_limits = [1.33*jupiter_dist,1.33*jupiter_dist,1.33*jupiter_z]
+    elif(key==11):#Saturn
+        current_body = 9
+        current_limits = [1.33*saturn_dist,1.33*saturn_dist,1.33*saturn_z]
+    elif(key==12):#Uranus
+        current_body = 10
+        current_limits = [1.33*uranus_dist,1.33*uranus_dist,1.33*uranus_z]
+    elif(key==13):#Neptune
+        current_body = 11
+        current_limits = [1.33*neptune_dist,1.33*neptune_dist,1.33*neptune_z]
+
+#Function that implements the possibility of zooming in and out by scrolling with the mouse
 def on_scroll(event):
     # print(event.button, event.step)
     increment = event.step
@@ -251,9 +300,13 @@ def COM(planet_indexes):
         center_of_mass+=pars[i]*np.array(planet_vector(i))
     return center_of_mass/total_mass
 
+additional_text=""
+
 #Function to call in the animation later. It updates the axes when the user wants to change view. The array "init_data"
 #is the one which is later updated in the animation.
 def center_on_planet(planet_index,limits,string):
+    global additional_text
+    additional_text = ""
     if(planet_index==-1):
         # total_mass = pars[3]+pars[4]
         # center_of_mass = (pars[3]/total_mass)*np.array(planet_vector(3))+(pars[4]/total_mass)*np.array(planet_vector(4))
@@ -261,7 +314,8 @@ def center_on_planet(planet_index,limits,string):
         ax.set(xlim3d=(center_of_mass[0]-limits[0], center_of_mass[0]+limits[0]))
         ax.set(ylim3d=(center_of_mass[1]-limits[1], center_of_mass[1]+limits[1]))
         ax.set(zlim3d=(center_of_mass[2]-limits[2], center_of_mass[2]+limits[2]))
-        string+="\nEarth-Moon COM: ({:.3E},{:.3E},{:.3E})".format(center_of_mass[0]/AU,center_of_mass[1]/AU,center_of_mass[2]/AU)
+        # string+="\nEarth-Moon COM: ({:.3E},{:.3E},{:.3E})".format(center_of_mass[0]/AU,center_of_mass[1]/AU,center_of_mass[2]/AU)
+        additional_text+= "Earth-Moon COM: ({:.3E},{:.3E},{:.3E})".format(center_of_mass[0]/AU,center_of_mass[1]/AU,center_of_mass[2]/AU)
     elif(planet_index==-2):
         # total_mass = pars[5]+pars[6]+pars[7]
         # center_of_mass = (pars[5]/total_mass)*np.array(planet_vector(5))+(pars[6]/total_mass)*np.array(planet_vector(6))+(pars[7]/total_mass)*np.array(planet_vector(7))
@@ -269,22 +323,27 @@ def center_on_planet(planet_index,limits,string):
         ax.set(xlim3d=(center_of_mass[0]-limits[0], center_of_mass[0]+limits[0]))
         ax.set(ylim3d=(center_of_mass[1]-limits[1], center_of_mass[1]+limits[1]))
         ax.set(zlim3d=(center_of_mass[2]-limits[2], center_of_mass[2]+limits[2]))
-        string+="\nMars with moons COM: ({:.3E},{:.3E},{:.3E})".format(center_of_mass[0]/AU,center_of_mass[1]/AU,center_of_mass[2]/AU)
+        # string+="\nMars with moons COM: ({:.3E},{:.3E},{:.3E})".format(center_of_mass[0]/AU,center_of_mass[1]/AU,center_of_mass[2]/AU)
+        additional_text+= "Mars with moons COM: ({:.3E},{:.3E},{:.3E})".format(center_of_mass[0]/AU,center_of_mass[1]/AU,center_of_mass[2]/AU)
     else:
         #update of the axes
         ax.set(xlim3d=(init_data[0+3*planet_index]-limits[0], init_data[0+3*planet_index]+limits[0]))
         ax.set(ylim3d=(init_data[1+3*planet_index]-limits[1], init_data[1+3*planet_index]+limits[1]))
         ax.set(zlim3d=(init_data[2+3*planet_index]-limits[2], init_data[2+3*planet_index]+limits[2]))
 
-        string+="\n"+names[planet_index]
-        string+="({:.3E},{:.3E},{:.3E})".format(init_data[0+3*planet_index]/AU,init_data[1+3*planet_index]/AU,init_data[2+3*planet_index]/AU)
+        # string+="\n"+names[planet_index]
+        additional_text += names[planet_index]
+        # string+="({:.3E},{:.3E},{:.3E})".format(init_data[0+3*planet_index]/AU,init_data[1+3*planet_index]/AU,init_data[2+3*planet_index]/AU)
+        additional_text += "({:.3E},{:.3E},{:.3E})".format(init_data[0+3*planet_index]/AU,init_data[1+3*planet_index]/AU,init_data[2+3*planet_index]/AU)
         dist=np.linalg.norm(np.array(planet_vector(planet_index))
                             -np.array(planet_vector(0)))
         if(planet_index in allowed_planets):
-            string+="\nDistance from the sun= {:.3E}".format(np.linalg.norm(delta_r[planet_index][1])/AU)
+            # string+="\nDistance from the sun= {:.3E}".format(np.linalg.norm(delta_r[planet_index][1])/AU)
+            additional_text+="\nDistance from the sun= {:.3E}".format(np.linalg.norm(delta_r[planet_index][1])/AU)
         
         if(planet_index in allowed_planets):
-            string+="\nAngle= {:.3f}".format(delta_theta[planet_index][1])
+            # string+="\nAngle= {:.3f}".format(delta_theta[planet_index][1])
+            additional_text+="\nAngle= {:.3f}".format(delta_theta[planet_index][1])
             # if(len(delta_theta[planet_index])==3):
             #     #The angular speed is caclulated like Δtheta/Δt
             #     momentum = pars[planet_index]*(np.linalg.norm(planet_vector(planet_index))**2)*np.abs(delta_theta[planet_index][2]-delta_theta[planet_index][1])/float(step)
@@ -322,6 +381,7 @@ for i in range(0,number_of_bodies):
     plots.append(plot)
 
 data = ax.text2D(0.05, 0.85, "t={},frame={}".format(instant,0), transform=ax.transAxes)
+planet_name = ax.text2D(-0.1,-0.1, "test")
 
 def rk4(t, timestep,vars,pars,funcs):
     k1=[]
@@ -420,8 +480,10 @@ for i in range(0,number_of_bodies):
 
 plt.rcParams['text.usetex'] = True
 
+count = -1
+
 def update(frame):
-    global instant,init_data,computation_time,animation_time
+    global instant,init_data,computation_time,animation_time,count,additional_text
     #the outer loop is simply a repetition of the integration more times. By integrating more steps before plotting the animation can
     #be made faster
     start = time.time()
@@ -465,14 +527,13 @@ def update(frame):
         total_energy(pars,init_data),computation_time,animation_time)
     
     string=center_on_planet(current_body,current_limits,string)
-    # test = r'\nL_{\text{tot}}'
-    string += "\n"+r'$\vec{L_{\text{tot}}}$' + " = {}".format(total_angular_momentum())
-    string += "\n"+r'$\vert \vec{L_{\text{tot}}}\vert$' + " = {:.7E}".format(np.linalg.norm(total_angular_momentum()))
+    string += "\n"+r'$L_{\text{tot}}$' + " = {}".format(total_angular_momentum())
+    string += "\n"+r'$\vert L_{\text{tot}}\vert$' + " = {:.7E}".format(np.linalg.norm(total_angular_momentum()))
     data.set_text(string)
-    # print(frame)
-    return (plots,data)
+    planet_name.set_text(additional_text)
+    return (plots,data,planet_name)
 
         
-ani = animation.FuncAnimation(fig=fig, func=update, frames=500, interval=1)
+ani = animation.FuncAnimation(fig=fig, func=update, frames=1050, interval=1)
 plt.show()
-# ani.save(filename="test_solar_inclination.gif", writer="imagemagick")
+# ani.save(filename="all_planets.gif", writer="imagemagick")
