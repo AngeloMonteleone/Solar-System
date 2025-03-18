@@ -178,8 +178,11 @@ def study_orbits():
             print(names[i]+"Period #{}: {}".format(years[i],instant/86400))
 ```
 
-Notwithstanding this, the code produced results which are coherent with the actual ones. For example in a test run with an integration step of 8640 seconds (1/10 of a day) the results for the orbital periods were the following. All data is reported in days (in parenthesis the real value):
+Notwithstanding this, the code produced results which are coherent with the actual ones. For example in a test run with an integration step of 8640 seconds (1/10 of a day) the results for the duration of the first orbit were the following. All data is reported in days (in parenthesis the real value):
 + Mercury: 88.1 (87.96)
 + Venus: 225.0 (224.7)
 + Earth: 366.2 (365.25)
 + Mars: 687.7 (686.96)
+Test with integration step of 86400 seconds (1 day):
++ Jupiter: 4342 (4332)
++ Saturn: 10625 (10756)
