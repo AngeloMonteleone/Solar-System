@@ -187,3 +187,7 @@ Notwithstanding this, the code produced results which are coherent with the actu
 Test with integration step of 86400 seconds (1 day):
 + Jupiter: 4342 (4332)
 + Saturn: 10625 (10756)
+
+Another test was conducted, this time calculating the orbital period by averaging the elapsed days over the number of completed orbits whenever an orbit was completed. The results are reported for the first four planets in a plot visualizing the absolute deviation from the true orbital period. From the plot it can be seen that the estimate improves as the simulation progresses.
+
+![](period_graphs.png)
